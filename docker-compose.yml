@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  database:
+    container_name: formation-database
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5435:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+
+  backend:
+    container_name: formation-backend
+    image: formation-backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
+    volumes:
+      - ./backend/app:/app/app
+  
+  frontend:
+    container_name: formation-frontend
+    image: formation-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+
+volumes:
+  db_data:
+    driver: local
+      
+
