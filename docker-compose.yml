@@ -39,8 +39,21 @@ services:
     volumes:
       - ./frontend/src:/app/src
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: formation-pgAdmin
+    ports:
+      - "8889:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+
 volumes:
   db_data:
     driver: local
+  pgadmin-data:
       
 

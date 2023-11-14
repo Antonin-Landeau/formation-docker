@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,35 +23,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+class CommandBody(BaseModel):
+    name: str
+    description: str
+    command: str
+    comment: str
+
+
 def get_db():
-  db = SessionLocal()
-  try:
-    yield db
-  finally:
-    db.close()
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 @app.get("/")
 def root():
-  return {"message": "server is running !"}
+    return {"message": "server is running !"}
 
 
 @app.post("/command")
-def create_command(db:Session = Depends(get_db)):
-  new_command = models.CommandModel()
-  new_command.name = "Test",
-  new_command.description =" Descreiption"
-  new_command.command = "docker compose up"
-  new_command.comment = "comment"
+def create_command(command: CommandBody, db: Session = Depends(get_db)):
+    new_command = models.CommandModel()
+    new_command.name = command.name
+    new_command.description = command.description
+    new_command.command = command.command
+    new_command.comment = command.comment
 
-  db.add(new_command)
-  db.commit()
-  db.refresh(new_command)
-  
-  
-  return {"message": "Command created"}
+    db.add(new_command)
+    db.commit()
+    db.refresh(new_command)
+
+    return {"message": "Command created"}
+
 
 @app.get("/commands")
-def get_commands(db:Session = Depends(get_db)):
-  commands = db.query(models.CommandModel).all()
+def get_commands(db: Session = Depends(get_db)):
+    commands = db.query(models.CommandModel).all()
 
-  return commands
+    return commands
