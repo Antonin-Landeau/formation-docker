@@ -12,6 +12,8 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
 
   backend:
     container_name: formation-backend
@@ -25,6 +27,8 @@ services:
       - database
     volumes:
       - ./backend/app:/app/app
+    networks:
+      - app-network
   
   frontend:
     container_name: formation-frontend
@@ -38,17 +42,9 @@ services:
       - backend
     volumes:
       - ./frontend/src:/app/src
+    networks:
+      - app-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: formation-pgAdmin
-    ports:
-      - "8889:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
-      PGADMIN_DEFAULT_PASSWORD: strong-password
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
 
 
 volumes:
@@ -56,4 +52,6 @@ volumes:
     driver: local
   pgadmin-data:
       
-
+networks:
+  app-network:
+    driver: bridge
