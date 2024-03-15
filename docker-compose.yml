@@ -22,7 +22,8 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.fd-api.rule=Host(`formation-docker-backend.antonin-landeau.com`)"
       - "traefik.http.routers.fd-api.entrypoints=websecure" 
-      - "traefik.http.routers.fd-api.tls.certresolver=letsencrypt" 
+      - "traefik.http.routers.fd-api.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.testheader.headers.accesscontrolalloworigin=*"
   database:
     container_name: formation-docker-database
     image: postgres:16-alpine
