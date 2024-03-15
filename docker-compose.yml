@@ -35,6 +35,23 @@ services:
     networks:
       - formation-docker-backend
 
+  frontend:
+    container_name: formation-docker-react
+    image: formation-frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.fd-frontend.rule=Host(`formation-docker-frontend.antonin-landeau.com`)"
+      - "traefik.http.routers.fd-frontend.entrypoints=websecure" 
+      - "traefik.http.routers.fd-frontend.tls.certresolver=letsencrypt"
+
 
 volumes:
   db_data:
