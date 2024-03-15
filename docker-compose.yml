@@ -1,57 +1,45 @@
 version: '3.8'
 services:
-  database:
-    container_name: formation-database
-    image: postgres:16-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5435:5432
-    volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./database:/docker-entrypoint-initdb.d
-    networks:
-      - app-network
-
-  backend:
-    container_name: formation-backend
+  api:
+    container_name: formation-docker-fastapi
     image: formation-backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - 8000:8000
+    env_file:
+      - .env
     depends_on:
       - database
+    ports:
+      - 8000:8000
     volumes:
       - ./backend/app:/app/app
     networks:
-      - app-network
-  
-  frontend:
-    container_name: formation-frontend
-    image: formation-frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - 5173:5173
-    depends_on:
-      - backend
+      - formation-docker-backend
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.fd-api.rule=Host(`formation-docker-backend.antonin-landeau.com`)"
+      - "traefik.http.routers.fd-api.entrypoints=websecure" 
+      - "traefik.http.routers.fd-api.tls.certresolver=letsencrypt" 
+  database:
+    container_name: formation-docker-database
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./frontend/src:/app/src
+      - db_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
     networks:
-      - app-network
-
+      - formation-docker-backend
 
 
 volumes:
   db_data:
-    driver: local
-  pgadmin-data:
-      
+
 networks:
-  app-network:
-    driver: bridge
+  proxy:
+    external: true
+  formation-docker-backend:

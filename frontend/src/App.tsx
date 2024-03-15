@@ -2,7 +2,7 @@ import { Copy, Search, Terminal } from "lucide-react";
 import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import axios from "axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   Dialog,
@@ -36,17 +36,20 @@ function App() {
   const [description, setDescription] = useState("");
   const [command, setCommand] = useState("");
 
+  const queryClient = useQueryClient();
+
   const { data: commands, isLoading } = useQuery({
     queryKey: ["commands"],
     queryFn: getCommands,
   });
 
   const mutation = useMutation({
+    mutationKey: ["commands"],
     mutationFn: createCommand,
     onSuccess: (data, variables, context) => {
       toast.success("Command created succesfuly");
-
       setIsCreateCommandDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["commands"] });
     },
     onError: (e) => {
       console.log(e);

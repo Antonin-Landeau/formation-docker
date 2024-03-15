@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -61,6 +62,8 @@ def create_command(command: CommandBody, db: Session = Depends(get_db)):
 
 @app.get("/commands")
 def get_commands(db: Session = Depends(get_db)):
-    commands = db.query(models.CommandModel).all()
+    commands = (
+        db.query(models.CommandModel).order_by(desc(models.CommandModel.id)).all()
+    )
 
     return commands
