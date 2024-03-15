@@ -13,7 +13,7 @@ from .database import SessionLocal
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",
+    "*",
 ]
 
 app.add_middleware(
