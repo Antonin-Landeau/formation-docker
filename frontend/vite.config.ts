@@ -4,6 +4,9 @@ import { defineConfig } from "vite"
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    BACKEND_URL: process.env.BACKEND_URL 
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
