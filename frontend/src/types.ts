@@ -5,3 +5,7 @@ export interface Command {
   comment?: string;
   command: string;
 }
+
+export interface CommandRes {
+  commands: Command[];
+}
